@@ -3,7 +3,8 @@ import { getAuctions, deleteAuction } from '../api/ApiHelper';
 import type { Auction } from '../types/Auction';
 import { useAuth0 } from '@auth0/auth0-react';
 import {
-  Box, Typography, List, ListItem, ListItemText, IconButton, CircularProgress, Paper
+  Box, Typography, List, ListItem, ListItemText, IconButton, CircularProgress, Paper,
+  Toolbar
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 
@@ -48,6 +49,7 @@ export default function AuctionList() {
 
   return (
     <Box>
+      <Toolbar sx={{minHeight:64, p:0}}  />
       <Typography variant="h6" mb={2}>Auctions</Typography>
       <List>
         {auctions.map(a => (

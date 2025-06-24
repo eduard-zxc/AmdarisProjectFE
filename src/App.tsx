@@ -6,7 +6,6 @@ import RegisterPage from './pages/RegisterPage';
 import Sidebar from './components/Sidebar';
 import Filters from './components/Filters';
 import AuctionList from './components/AuctionList';
-import AuctionForm from './components/AuctionForm';
 import Header from './components/Header';
 import { getCategories } from './api/ApiHelper';
 import { ThemeProvider, createTheme, CssBaseline, Box, useMediaQuery } from '@mui/material';
@@ -24,7 +23,7 @@ const theme = createTheme({
 });
 
 const drawerWidth = 180;
-const appBarHeight = 64;
+const appBarHeight = 0;
 
 function App() {
   const [refresh, setRefresh] = useState(false);
@@ -44,7 +43,7 @@ function App() {
     fetchCategories();
   }, []);
 
-  const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
+  const handleDrawerToggle = () => setMobileOpen((open) => !open);
 
   return (
     <ThemeProvider theme={theme}>
@@ -53,7 +52,14 @@ function App() {
         <Router>
           <Header onMenuClick={handleDrawerToggle} />
           <Box sx={{ display: 'flex' }}>
-            <Sidebar mobileOpen={mobileOpen} onClose={handleDrawerToggle} />
+            <Sidebar
+              onAuctionCreated={() => setRefresh((r) => !r)}
+              mobileOpen={mobileOpen}
+              onCloseDrawer={handleDrawerToggle}
+              isDesktop={isDesktop}
+              drawerWidth={drawerWidth}
+              appBarHeight={appBarHeight}
+            />
             <Box
               component="main"
               sx={{
@@ -68,7 +74,6 @@ function App() {
             >
               <Filters categories={categories} />
               <Box sx={{ flex: 1, p: 4 }}>
-                <AuctionForm onCreated={() => setRefresh(r => !r)} />
                 <AuctionList key={refresh ? 1 : 0} />
                 <Routes>
                   <Route path="/login" element={<LoginPage />} />

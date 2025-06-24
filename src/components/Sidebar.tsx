@@ -1,55 +1,90 @@
-import { Drawer, List, ListItem, ListItemText, ListItemButton, Avatar, Typography, Box, Divider, useMediaQuery, type Theme } from '@mui/material';
+import { useState } from 'react';
+import { Drawer, List, ListItem, ListItemText, ListItemButton, Avatar, Typography, Box, Divider, Dialog, Toolbar } from '@mui/material';
+import AuctionForm from './AuctionForm';
 
-const drawerWidth = 180;
+export interface SidebarProps {
+  onAuctionCreated: () => void;
+  mobileOpen: boolean;
+  onCloseDrawer: () => void;
+  isDesktop: boolean;
+  drawerWidth: number;
+  appBarHeight: number;
+}
 
-const SidebarContent = () => (
-  <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 2 }}>
-    <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-      <Avatar alt="User" src="person.jpg" sx={{ width: 32, height: 32 }} />
-      <Box>
-        <Typography variant="body2">User:</Typography>
-        <Typography variant="body2" fontWeight="bold">John Doe</Typography>
+const Sidebar = ({
+  onAuctionCreated,
+  mobileOpen,
+  onCloseDrawer,
+  isDesktop,
+  drawerWidth,
+  appBarHeight,
+}: SidebarProps) => {
+  const [openDialog, setOpenDialog] = useState(false);
+
+  const handleOpenDialog = () => setOpenDialog(true);
+  const handleCloseDialog = () => setOpenDialog(false);
+
+  const drawerContent = (
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 2 }}>
+      <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Avatar alt="User" src="person.jpg" sx={{ width: 32, height: 32 }} />
+        <Box>
+          <Typography variant="body2">User:</Typography>
+          <Typography variant="body2" fontWeight="bold">John Doe</Typography>
+        </Box>
       </Box>
-    </Box>
-    <Divider sx={{ mb: 2 }} />
-    <List>
-      {['My Auctions', 'Create Auction', 'Bids', 'Categories', 'Profile', 'Settings', 'Logout'].map((text, idx) => (
-        <ListItem key={text} disablePadding>
-          <ListItemButton>
-            <ListItemText primary={text} />
+      <Divider sx={{ mb: 2 }} />
+      <List>
+        <ListItem disablePadding>
+          <ListItemButton onClick={handleOpenDialog}>
+            <ListItemText primary="Create Auction" />
           </ListItemButton>
         </ListItem>
-      ))}
-    </List>
-    {/* Optionally, place logout button at the bottom */}
-    {/* <Box sx={{ mt: 'auto' }}><LogoutButton /></Box> */}
-  </Box>
-);
-
-const Sidebar = ({ mobileOpen, onClose }: { mobileOpen: boolean; onClose: () => void }) => {
-  const isDesktop = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
+        {['My Auctions', 'Bids', 'Categories', 'Profile', 'Settings', 'Logout'].map((text) => (
+          <ListItem key={text} disablePadding>
+            <ListItemButton>
+              <ListItemText primary={text} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+    </Box>
+  );
 
   return (
-    <Drawer
-      variant={isDesktop ? "permanent" : "temporary"}
-      open={isDesktop ? true : mobileOpen}
-      onClose={onClose}
-      ModalProps={{ keepMounted: true }}
-      sx={{
-        width: drawerWidth,
-        flexShrink: 0,
-        [`& .MuiDrawer-paper`]: {
+    <>
+      <Drawer
+        variant={isDesktop ? 'permanent' : 'temporary'}
+        open={isDesktop ? true : mobileOpen}
+        onClose={onCloseDrawer}
+        ModalProps={{ keepMounted: true }}
+        sx={{
           width: drawerWidth,
-          boxSizing: 'border-box',
-          bgcolor: 'secondary.main',
-          color: 'white',
-          top: isDesktop ? '64px' : 0,
-          height: isDesktop ? 'calc(100vh - 64px)' : '100vh',
-        },
-      }}
-    >
-      <SidebarContent />
-    </Drawer>
+          flexShrink: 0,
+          [`& .MuiDrawer-paper`]: {
+            width: drawerWidth,
+            boxSizing: 'border-box',
+            bgcolor: 'secondary.main',
+            color: 'white',
+            top: isDesktop ? `${appBarHeight}px` : 0,
+            height: isDesktop ? `calc(100vh - ${appBarHeight}px)` : '100vh',
+          },
+        }}
+      >
+        <Toolbar sx={{ minHeight: `${appBarHeight}px` }} /> {/* Spacer for alignment */}
+        {drawerContent}
+      </Drawer>
+      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+        <Box sx={{ p: 3 }}>
+          <AuctionForm
+            onCreated={() => {
+              handleCloseDialog();
+              onAuctionCreated();
+            }}
+          />
+        </Box>
+      </Dialog>
+    </>
   );
 };
 
