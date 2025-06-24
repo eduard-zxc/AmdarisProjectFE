@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { createAuction, getCategories } from '../api/ApiHelper';
+import { Box, TextField, Button, MenuItem, Typography, CircularProgress } from '@mui/material';
 
 type AuctionFormProps = {
   onCreated: () => void;
@@ -14,7 +15,6 @@ const AuctionForm = ({ onCreated }: AuctionFormProps) => {
   const [categoryId, setCategoryId] = useState('');
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(false);
-
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -42,19 +42,19 @@ const AuctionForm = ({ onCreated }: AuctionFormProps) => {
           audience: import.meta.env.VITE_AUTH0_AUDIENCE,
         }
       });
-      
+
       if (!user?.sub) {
-  alert('User ID is missing.');
-  setLoading(false);
-  return;
-}
+        alert('User ID is missing.');
+        setLoading(false);
+        return;
+      }
       await createAuction(
         {
           title,
           description,
           startingPrice: Number(startingPrice),
           categoryId,
-          userId: user?.sub, 
+          userId: user?.sub,
         },
         token
       );
@@ -71,43 +71,54 @@ const AuctionForm = ({ onCreated }: AuctionFormProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ marginBottom: '2rem' }}>
-      <h3>Create Auction</h3>
-      <input
-        type="text"
-        placeholder="Title"
+    <Box component="form" onSubmit={handleSubmit} mb={4} sx={{ maxWidth: 400 }}>
+      <Typography variant="h6" mb={2}>Create Auction</Typography>
+      <TextField
+        label="Title"
         value={title}
         onChange={e => setTitle(e.target.value)}
         required
+        fullWidth
+        margin="normal"
       />
-      <input
-        type="text"
-        placeholder="Description"
+      <TextField
+        label="Description"
         value={description}
         onChange={e => setDescription(e.target.value)}
         required
+        fullWidth
+        margin="normal"
       />
-      <input
+      <TextField
+        label="Starting Price"
         type="number"
-        placeholder="Starting Price"
         value={startingPrice}
         onChange={e => setStartingPrice(e.target.value)}
         required
+        fullWidth
+        margin="normal"
+        inputProps={{ min: 0 }}
       />
-      <select
+      <TextField
+        select
+        label="Category"
         value={categoryId}
         onChange={e => setCategoryId(e.target.value)}
         required
+        fullWidth
+        margin="normal"
       >
-        <option value="">Select Category</option>
+        <MenuItem value="">Select Category</MenuItem>
         {categories.map(cat => (
-          <option key={cat.id} value={cat.id}>{cat.name}</option>
+          <MenuItem key={cat.id} value={cat.id}>{cat.name}</MenuItem>
         ))}
-      </select>
-      <button type="submit" disabled={loading}>
-        {loading ? 'Creating...' : 'Create'}
-      </button>
-    </form>
+      </TextField>
+      <Box mt={2}>
+        <Button type="submit" variant="contained" color="primary" disabled={loading} fullWidth>
+          {loading ? <CircularProgress size={24} color="inherit" /> : 'Create'}
+        </Button>
+      </Box>
+    </Box>
   );
 };
 

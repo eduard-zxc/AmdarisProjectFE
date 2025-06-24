@@ -2,6 +2,10 @@ import { useEffect, useState } from 'react';
 import { getAuctions, deleteAuction } from '../api/ApiHelper';
 import type { Auction } from '../types/Auction';
 import { useAuth0 } from '@auth0/auth0-react';
+import {
+  Box, Typography, List, ListItem, ListItemText, IconButton, CircularProgress, Paper
+} from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 export default function AuctionList() {
   const [auctions, setAuctions] = useState<Auction[]>([]);
@@ -14,13 +18,11 @@ export default function AuctionList() {
         setLoading(false);
         return;
       }
-       const token = await getAccessTokenSilently(
-      {
-  authorizationParams: {
-    audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+      const token = await getAccessTokenSilently({
+        authorizationParams: {
+          audience: import.meta.env.VITE_AUTH0_AUDIENCE,
         },
-      }
-    );
+      });
       const data = await getAuctions(token);
       setAuctions(data.items || []);
       setLoading(false);
@@ -33,30 +35,38 @@ export default function AuctionList() {
       alert('You must be logged in to delete an auction.');
       return;
     }
-     const token = await getAccessTokenSilently(
-      {
-  authorizationParams: {
-    audience: import.meta.env.VITE_AUTH0_AUDIENCE,
-        },
-      }
-    );
+    const token = await getAccessTokenSilently({
+      authorizationParams: {
+        audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+      },
+    });
     await deleteAuction(id, token);
     setAuctions(auctions.filter(a => a.id !== id));
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <CircularProgress />;
 
   return (
-    <div>
-      <h2>Auctions</h2>
-      <ul>
+    <Box>
+      <Typography variant="h6" mb={2}>Auctions</Typography>
+      <List>
         {auctions.map(a => (
-          <li key={a.id}>
-            <strong>{a.title}</strong> - {a.description} (${a.startingPrice})
-            <button onClick={() => handleDelete(a.id)} style={{marginLeft: 8}}>Delete</button>
-          </li>
+          <Paper key={a.id} sx={{ mb: 2, p: 2 }}>
+            <ListItem
+              secondaryAction={
+                <IconButton edge="end" aria-label="delete" onClick={() => handleDelete(a.id)}>
+                  <DeleteIcon />
+                </IconButton>
+              }
+            >
+              <ListItemText
+                primary={<strong>{a.title}</strong>}
+                secondary={`${a.description} ($${a.startingPrice})`}
+              />
+            </ListItem>
+          </Paper>
         ))}
-      </ul>
-    </div>
+      </List>
+    </Box>
   );
 }
