@@ -1,33 +1,32 @@
 import { useEffect, useState } from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
 import { createAuction, getCategories } from '../api/ApiHelper';
 import { Box, TextField, Button, MenuItem, Typography, CircularProgress } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { useAuth } from '../components/Auth/AuthProvider';
 
 type AuctionFormProps = {
   onCreated: () => void;
 };
 
 const AuctionForm = ({ onCreated }: AuctionFormProps) => {
-  const { getAccessTokenSilently, isAuthenticated, user } = useAuth0();
+  const { getAccessTokenSilently, isAuthenticated, user } = useAuth();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [startingPrice, setStartingPrice] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(false);
-
-  // Start and End time states
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [endTime, setEndTime] = useState<Date | null>(null);
-
-  // Validation state
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    fetchCategories();
+  }, [getAccessTokenSilently]);
+
+  const fetchCategories = async () => {
       try {
         const token = await getAccessTokenSilently({
           authorizationParams: {
@@ -40,8 +39,6 @@ const AuctionForm = ({ onCreated }: AuctionFormProps) => {
         setCategories([]);
       }
     };
-    fetchCategories();
-  }, [getAccessTokenSilently]);
 
   // Validation logic
   const validate = () => {
@@ -87,13 +84,12 @@ const AuctionForm = ({ onCreated }: AuctionFormProps) => {
         setLoading(false);
         return;
       }
-        await createAuction(
+      await createAuction(
         {
           title,
           description,
           startingPrice: Number(startingPrice),
           categoryId,
-          userId: user.sub,
           startTime: startTime!.toISOString(),
           endTime: endTime!.toISOString(),
         },

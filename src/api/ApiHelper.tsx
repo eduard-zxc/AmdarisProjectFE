@@ -1,9 +1,9 @@
 import type { Auction } from '../types/Auction';
 
-const API_URL = 'http://localhost:5188/api/auctions';
+const API_URL = 'http://localhost:5188/api';
 
 export async function createAuction(auction: Omit<Auction, 'id'>, token: string) {
-  const res = await fetch(API_URL, {
+  const res = await fetch(`${API_URL}/auctions`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -16,7 +16,7 @@ export async function createAuction(auction: Omit<Auction, 'id'>, token: string)
 }
 
 export async function deleteAuction(id: string, token: string) {
-  const res = await fetch(`http://localhost:5188/api/auctions/${id}`, {
+  const res = await fetch(`${API_URL}/auctions/${id}`, {
     method: 'DELETE',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -26,7 +26,7 @@ export async function deleteAuction(id: string, token: string) {
 }
 
 export async function getAuctions(token: string) {
-  const res = await fetch('http://localhost:5188/api/auctions', {
+  const res = await fetch(`${API_URL}/auctions`, {
     headers: {
       'Authorization': `Bearer ${token}`,
     },
@@ -36,7 +36,7 @@ export async function getAuctions(token: string) {
 }
 
 export async function getCategories(token: string) {
-  const res = await fetch('http://localhost:5188/api/categories', {
+  const res = await fetch(`${API_URL}/categories`, {
     headers: {
       'Authorization': `Bearer ${token}`,
     },

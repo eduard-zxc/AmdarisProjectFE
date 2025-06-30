@@ -14,7 +14,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       clientId={clientId}
         authorizationParams={{
     audience: import.meta.env.VITE_AUTH0_AUDIENCE,
-    redirect_uri: window.location.origin
+    redirect_uri: window.location.origin,
+    scope: 'openid profile email',
   }}
       cacheLocation="localstorage"
     >

@@ -40,7 +40,7 @@ const Sidebar = ({
             <ListItemText primary="Create Auction" />
           </ListItemButton>
         </ListItem>
-        {['My Auctions', 'Bids', 'Categories', 'Profile', 'Settings', 'Logout'].map((text) => (
+        {['My Auctions', 'Bids', 'Categories', 'Profile', 'Settings'].map((text) => (
           <ListItem key={text} disablePadding>
             <ListItemButton>
               <ListItemText primary={text} />
