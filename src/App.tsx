@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { AuthProvider } from './components/Auth/AuthProvider';
+import { AuthProvider, useAuth } from './components/Auth/AuthProvider';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import Sidebar from './components/Sidebar';
 import Filters from './components/Filters';
 import AuctionList from './components/AuctionList';
 import Header from './components/Header';
-import { getCategories } from './api/ApiHelper';
+import { ensureUserExists, getCategories } from './api/ApiHelper';
 import { ThemeProvider, createTheme, CssBaseline, Box, useMediaQuery } from '@mui/material';
 
 const theme = createTheme({
@@ -30,6 +30,25 @@ function App() {
   const [categories, setCategories] = useState<string[]>([]);
   const [mobileOpen, setMobileOpen] = useState(false);
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
+  const {isAuthenticated, getAccessTokenSilently} = useAuth();
+
+  useEffect(() => {
+    const checkUser = async () => {
+      if (isAuthenticated) {
+        const token = await getAccessTokenSilently({
+          authorizationParams: {
+            audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+          }
+        });
+        try {
+          await ensureUserExists(token);
+        } catch (err) {
+          console.error('User check/creation failed', err);
+        }
+      }
+    };
+    checkUser();
+  }, [isAuthenticated, getAccessTokenSilently]);
 
   useEffect(() => {
     const fetchCategories = async () => {

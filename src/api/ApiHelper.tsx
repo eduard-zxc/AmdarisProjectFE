@@ -44,3 +44,15 @@ export async function getCategories(token: string) {
   if (!res.ok) throw new Error('Failed to fetch categories');
   return res.json();
 }
+
+export async function ensureUserExists(token: string) {
+  const res = await fetch(`${API_URL}/users/me`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  });
+  if (!res.ok) throw new Error('Failed to ensure user exists');
+  return res.json();
+}
