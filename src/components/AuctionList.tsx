@@ -4,10 +4,11 @@ import type { Auction } from '../types/Auction';
 import { useAuth0 } from '@auth0/auth0-react';
 import {
   Box, Typography, List, ListItem, ListItemText, IconButton, CircularProgress, Paper,
-  Toolbar
+  Toolbar, ListItemButton
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNotification } from './NotificationsProvider';
+import { Link as RouterLink } from 'react-router-dom';
 
 export default function AuctionList() {
   const [auctions, setAuctions] = useState<Auction[]>([]);
@@ -33,24 +34,25 @@ export default function AuctionList() {
     fetchAuctions();
   }, [getAccessTokenSilently, isAuthenticated]);
 
-const handleDelete = async (id: string) => {
-  if (!isAuthenticated) {
-    notify('You must be logged in to delete an auction.', 'error');
-    return;
-  }
-  try {
-    const token = await getAccessTokenSilently({
-      authorizationParams: {
-        audience: import.meta.env.VITE_AUTH0_AUDIENCE,
-      },
-    });
-    await deleteAuction(id, token);
-    setAuctions(auctions.filter(a => a.id !== id));
-    notify('Auction deleted successfully!', 'success');
-  } catch (err) {
-    notify('Failed to delete auction', 'error');
-  }
-};
+  const handleDelete = async (id: string) => {
+    if (!isAuthenticated) {
+      notify('You must be logged in to delete an auction.', 'error');
+      return;
+    }
+    try {
+      const token = await getAccessTokenSilently({
+        authorizationParams: {
+          audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+        },
+      });
+      await deleteAuction(id, token);
+      setAuctions(auctions.filter(a => a.id !== id));
+      notify('Auction deleted successfully!', 'success');
+    } catch (err) {
+      notify('Failed to delete auction', 'error');
+    }
+  };
+
   if (loading) return <CircularProgress />;
 
   return (
@@ -66,11 +68,17 @@ const handleDelete = async (id: string) => {
                   <DeleteIcon />
                 </IconButton>
               }
+              disablePadding
             >
-              <ListItemText
-                primary={<strong>{a.title}</strong>}
-                secondary={`${a.description} ($${a.startingPrice})`}
-              />
+              <ListItemButton
+                component={RouterLink}
+                to={`/auctions/${a.id}`}
+              >
+                <ListItemText
+                  primary={<strong>{a.title}</strong>}
+                  secondary={`${a.description} ($${a.startingPrice})`}
+                />
+              </ListItemButton>
             </ListItem>
           </Paper>
         ))}

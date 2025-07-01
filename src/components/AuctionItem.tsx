@@ -1,36 +1,80 @@
 import React, { useState } from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
+import { useNotification } from './NotificationsProvider';
+import { placeBid } from '../api/ApiHelper';
+import { Button, TextField, Box } from '@mui/material';
+import { useUserId } from './UserContext';
 
-type AuctionItemProps = {
-  id: number;
-  title: string;
-  description: string;
-  currentBid: number;
-  onBid: (id: number, amount: number) => void;
+type PlaceBidProps = {
+  auctionId: string;
+  currentPrice: number;
+  minIncrement?: number;
+  onBidPlaced?: () => void; // callback to refresh auction/bids
 };
 
-const AuctionItem: React.FC<AuctionItemProps> = ({ id, title, description, currentBid, onBid }) => {
-  const [bid, setBid] = useState(currentBid + 1);
+const PlaceBid: React.FC<PlaceBidProps> = ({
+  auctionId,
+  currentPrice,
+  minIncrement = 1,
+  onBidPlaced,
+}) => {
+  const [amount, setAmount] = useState(currentPrice + minIncrement);
+  const [loading, setLoading] = useState(false);
+  const { isAuthenticated, getAccessTokenSilently } = useAuth0();
+  const notify = useNotification();
+  const { userId, loading: userLoading } = useUserId();
 
-  const handleBid = () => {
-    if (bid > currentBid) {
-      onBid(id, bid);
+  const handleBid = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isAuthenticated) {
+      notify('You must be logged in to place a bid.', 'error');
+      return;
+    }
+    if (userLoading || !userId) {
+      notify('User info not loaded yet. Please try again in a moment.', 'error');
+      return;
+    }
+    if (amount <= currentPrice) {
+      notify('Bid must be higher than current price.', 'warning');
+      return;
+    }
+    setLoading(true);
+    try {
+      const token = await getAccessTokenSilently({
+        authorizationParams: {
+          audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+        },
+      });
+      await placeBid({
+        auctionId: auctionId,
+        amount: amount,
+        userId: userId
+      }, token);
+      notify('Bid placed successfully!', 'success');
+      if (onBidPlaced) onBidPlaced();
+    } catch (err: any) {
+      notify(err?.message || 'Failed to place bid', 'error');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="auction-item" style={{ border: '1px solid #ccc', padding: 16, marginBottom: 16 }}>
-      <h2>{title}</h2>
-      <p>{description}</p>
-      <p>Current Bid: ${currentBid}</p>
-      <input
+    <Box component="form" onSubmit={handleBid} sx={{ display: 'flex', gap: 2, alignItems: 'center', mt: 2 }}>
+      <TextField
+        label="Your Bid"
         type="number"
-        min={currentBid + 1}
-        value={bid}
-        onChange={e => setBid(Number(e.target.value))}
+        value={amount}
+        onChange={e => setAmount(Number(e.target.value))}
+        inputProps={{ min: currentPrice + minIncrement, step: 1 }}
+        required
+        size="small"
       />
-      <button onClick={handleBid}>Place Bid</button>
-    </div>
+      <Button type="submit" variant="contained" disabled={loading || userLoading || !userId}>
+        {loading ? 'Placing...' : 'Place Bid'}
+      </Button>
+    </Box>
   );
 };
 
-export default AuctionItem;
+export default PlaceBid;

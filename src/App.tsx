@@ -1,25 +1,32 @@
-import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { AuthProvider, useAuth } from './components/Auth/AuthProvider';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import Sidebar from './components/Sidebar';
-import Filters from './components/Filters';
-import AuctionList from './components/AuctionList';
-import Header from './components/Header';
-import { ensureUserExists, getCategories } from './api/ApiHelper';
-import { ThemeProvider, createTheme, CssBaseline, Box, useMediaQuery } from '@mui/material';
-import { useNotification } from './components/NotificationsProvider';
+import { useState, useEffect } from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { AuthProvider, useAuth } from "./components/Auth/AuthProvider";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import Sidebar from "./components/Sidebar";
+import Filters from "./components/Filters";
+import AuctionList from "./components/AuctionList";
+import Header from "./components/Header";
+import { ensureUserExists, getCategories } from "./api/ApiHelper";
+import {
+  ThemeProvider,
+  createTheme,
+  CssBaseline,
+  Box,
+  useMediaQuery,
+} from "@mui/material";
+import { useNotification } from "./components/NotificationsProvider";
+import AuctionDetails from "./pages/AuctionDetails";
 
 const theme = createTheme({
   palette: {
-    mode: 'light',
-    primary: { main: '#2d3e50' },
-    secondary: { main: '#34495e' },
-    background: { default: '#f6f7fb' },
+    mode: "light",
+    primary: { main: "#2d3e50" },
+    secondary: { main: "#34495e" },
+    background: { default: "#f6f7fb" },
   },
   typography: {
-    fontFamily: 'Roboto, Arial, sans-serif',
+    fontFamily: "Roboto, Arial, sans-serif",
   },
 });
 
@@ -30,8 +37,8 @@ function App() {
   const [refresh, setRefresh] = useState(false);
   const [categories, setCategories] = useState<string[]>([]);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
-  const {isAuthenticated, getAccessTokenSilently} = useAuth();
+  const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
+  const { isAuthenticated, getAccessTokenSilently } = useAuth();
   const notify = useNotification();
 
   useEffect(() => {
@@ -40,14 +47,14 @@ function App() {
         const token = await getAccessTokenSilently({
           authorizationParams: {
             audience: import.meta.env.VITE_AUTH0_AUDIENCE,
-          }
+          },
         });
-      try {
-      await ensureUserExists(token);
-      notify('Welcome! Your profile is ready.', 'success');
-      } catch (err) {
-      notify('User check/creation failed', 'error');
-      console.error('User check/creation failed', err);
+        try {
+          await ensureUserExists(token);
+          notify("Welcome! Your profile is ready.", "success");
+        } catch (err) {
+          notify("User check/creation failed", "error");
+          console.error("User check/creation failed", err);
         }
       }
     };
@@ -57,7 +64,7 @@ function App() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const cats = await getCategories('');
+        const cats = await getCategories("");
         setCategories(cats.map((c: any) => c.name));
       } catch {
         setCategories([]);
@@ -74,7 +81,7 @@ function App() {
       <AuthProvider>
         <Router>
           <Header onMenuClick={handleDrawerToggle} />
-          <Box sx={{ display: 'flex' }}>
+          <Box sx={{ display: "flex" }}>
             <Sidebar
               onAuctionCreated={() => setRefresh((r) => !r)}
               mobileOpen={mobileOpen}
@@ -87,22 +94,46 @@ function App() {
               component="main"
               sx={{
                 flex: 1,
-                display: 'flex',
                 minHeight: `calc(100vh - ${appBarHeight}px)`,
-                bgcolor: 'background.default',
+                bgcolor: "background.default",
                 mt: `${appBarHeight}px`,
                 ml: 0,
-                transition: 'margin-left 0.3s',
+                transition: "margin-left 0.3s",
               }}
             >
-              <Filters categories={categories} />
-              <Box sx={{ flex: 1, p: 4 }}>
-                <AuctionList key={refresh ? 1 : 0} />
-                <Routes>
-                  <Route path="/login" element={<LoginPage />} />
-                  <Route path="/register" element={<RegisterPage />} />
-                </Routes>
-              </Box>
+              <Routes>
+                <Route
+                  path="/"
+                  element={
+                    <Box sx={{ display: "flex", gap: 4 }}>
+                      <Box sx={{ minWidth: 260, maxWidth: 320 }}>
+                        <Filters categories={categories} />
+                      </Box>
+                      <Box sx={{ flex: 1, mt: 4, mr: 4 }}>
+                        <AuctionList key={refresh ? 1 : 0} />
+                      </Box>
+                    </Box>
+                  }
+                />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route
+                  path="/auctions/:id"
+                  element={
+                    // This Box ensures AuctionDetails fills all available space
+                    <Box
+                      sx={{
+                        flex: 1,
+                        display: "flex",
+                        flexDirection: "column",
+                        p: 4,
+                      }}
+                    >
+                      <AuctionDetails />
+                    </Box>
+                  }
+                />
+              </Routes>
             </Box>
           </Box>
         </Router>

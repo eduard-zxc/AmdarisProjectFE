@@ -56,3 +56,32 @@ export async function ensureUserExists(token: string) {
   if (!res.ok) throw new Error('Failed to ensure user exists');
   return res.json();
 }
+
+export async function placeBid(
+  bid: { auctionId: string; amount: number; userId: string },
+  token: string
+) {
+  const res = await fetch(`${API_URL}/bids`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(bid),
+  });
+  if (!res.ok) {
+    const error = await res.text();
+    throw new Error(error || 'Failed to place bid');
+  }
+  return res.json();
+}
+
+export async function getAuctionById(id: string, token: string) {
+  const res = await fetch(`${API_URL}/auctions/${id}`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error('Failed to fetch auction');
+  return res.json();
+}
