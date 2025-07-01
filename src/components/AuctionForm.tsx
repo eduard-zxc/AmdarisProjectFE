@@ -5,6 +5,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { useAuth } from '../components/Auth/AuthProvider';
+import { useNotification } from './NotificationsProvider';
 
 type AuctionFormProps = {
   onCreated: () => void;
@@ -21,6 +22,7 @@ const AuctionForm = ({ onCreated }: AuctionFormProps) => {
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [endTime, setEndTime] = useState<Date | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const notify = useNotification();
 
   useEffect(() => {
     fetchCategories();
@@ -37,6 +39,7 @@ const AuctionForm = ({ onCreated }: AuctionFormProps) => {
         setCategories(cats);
       } catch (err) {
         setCategories([]);
+        notify('Failed to load categories', 'error');
       }
     };
 
@@ -103,8 +106,9 @@ const AuctionForm = ({ onCreated }: AuctionFormProps) => {
       setEndTime(null);
       setErrors({});
       onCreated();
+      notify('Auction created successfully!', 'success');
     } catch (err) {
-      alert('Failed to create auction');
+      notify('Failed to create auction', 'error');
     } finally {
       setLoading(false);
     }

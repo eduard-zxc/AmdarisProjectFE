@@ -9,6 +9,7 @@ import AuctionList from './components/AuctionList';
 import Header from './components/Header';
 import { ensureUserExists, getCategories } from './api/ApiHelper';
 import { ThemeProvider, createTheme, CssBaseline, Box, useMediaQuery } from '@mui/material';
+import { useNotification } from './components/NotificationsProvider';
 
 const theme = createTheme({
   palette: {
@@ -31,6 +32,7 @@ function App() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
   const {isAuthenticated, getAccessTokenSilently} = useAuth();
+  const notify = useNotification();
 
   useEffect(() => {
     const checkUser = async () => {
@@ -40,10 +42,12 @@ function App() {
             audience: import.meta.env.VITE_AUTH0_AUDIENCE,
           }
         });
-        try {
-          await ensureUserExists(token);
-        } catch (err) {
-          console.error('User check/creation failed', err);
+      try {
+      await ensureUserExists(token);
+      notify('Welcome! Your profile is ready.', 'success');
+      } catch (err) {
+      notify('User check/creation failed', 'error');
+      console.error('User check/creation failed', err);
         }
       }
     };

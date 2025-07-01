@@ -7,11 +7,13 @@ import {
   Toolbar
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useNotification } from './NotificationsProvider';
 
 export default function AuctionList() {
   const [auctions, setAuctions] = useState<Auction[]>([]);
   const [loading, setLoading] = useState(true);
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
+  const notify = useNotification();
 
   useEffect(() => {
     const fetchAuctions = async () => {
@@ -31,11 +33,12 @@ export default function AuctionList() {
     fetchAuctions();
   }, [getAccessTokenSilently, isAuthenticated]);
 
-  const handleDelete = async (id: string) => {
-    if (!isAuthenticated) {
-      alert('You must be logged in to delete an auction.');
-      return;
-    }
+const handleDelete = async (id: string) => {
+  if (!isAuthenticated) {
+    notify('You must be logged in to delete an auction.', 'error');
+    return;
+  }
+  try {
     const token = await getAccessTokenSilently({
       authorizationParams: {
         audience: import.meta.env.VITE_AUTH0_AUDIENCE,
@@ -43,8 +46,11 @@ export default function AuctionList() {
     });
     await deleteAuction(id, token);
     setAuctions(auctions.filter(a => a.id !== id));
-  };
-
+    notify('Auction deleted successfully!', 'success');
+  } catch (err) {
+    notify('Failed to delete auction', 'error');
+  }
+};
   if (loading) return <CircularProgress />;
 
   return (
