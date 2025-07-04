@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { AuthProvider, useAuth } from "./components/Auth/AuthProvider";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
 import Sidebar from "./components/Sidebar";
 import Filters from "./components/Filters";
 import AuctionList from "./components/AuctionList";
@@ -115,8 +113,6 @@ function App() {
                     </Box>
                   }
                 />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
                 <Route
                   path="/auctions/:id"
                   element={

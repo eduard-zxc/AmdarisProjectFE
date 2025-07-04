@@ -1,59 +1,81 @@
-import type { Auction } from '../types/Auction';
-
-const API_URL = 'http://localhost:5188/api';
-
-export async function createAuction(auction: Omit<Auction, 'id'>, token: string) {
-  const res = await fetch(`${API_URL}/auctions`, {
-    method: 'POST',
+// Upload an image for an auction
+export async function uploadAuctionImage(
+  auctionId: string,
+  file: File,
+  token: string
+) {
+  const formData = new FormData();
+  formData.append("file", file);
+  const res = await fetch(`${API_URL}/images/${auctionId}`, {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
+      // Do not set Content-Type, browser will set it for multipart/form-data
+    },
+    body: formData,
+  });
+  if (!res.ok) throw new Error("Failed to upload image");
+  return res.json();
+}
+import type { Auction } from "../types/Auction";
+
+const API_URL = "http://localhost:5188/api";
+
+export async function createAuction(
+  auction: Omit<Auction, "id">,
+  token: string
+) {
+  const res = await fetch(`${API_URL}/auctions`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(auction),
   });
-  if (!res.ok) throw new Error('Failed to create auction');
+  if (!res.ok) throw new Error("Failed to create auction");
   return res.json();
 }
 
 export async function deleteAuction(id: string, token: string) {
   const res = await fetch(`${API_URL}/auctions/${id}`, {
-    method: 'DELETE',
+    method: "DELETE",
     headers: {
-      'Authorization': `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
     },
   });
-  if (!res.ok) throw new Error('Failed to delete auction');
+  if (!res.ok) throw new Error("Failed to delete auction");
 }
 
 export async function getAuctions(token: string) {
   const res = await fetch(`${API_URL}/auctions`, {
     headers: {
-      'Authorization': `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
     },
   });
-  if (!res.ok) throw new Error('Failed to fetch auctions');
+  if (!res.ok) throw new Error("Failed to fetch auctions");
   return res.json();
 }
 
 export async function getCategories(token: string) {
   const res = await fetch(`${API_URL}/categories`, {
     headers: {
-      'Authorization': `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
     },
   });
-  if (!res.ok) throw new Error('Failed to fetch categories');
+  if (!res.ok) throw new Error("Failed to fetch categories");
   return res.json();
 }
 
 export async function ensureUserExists(token: string) {
   const res = await fetch(`${API_URL}/users/me`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
   });
-  if (!res.ok) throw new Error('Failed to ensure user exists');
+  if (!res.ok) throw new Error("Failed to ensure user exists");
   return res.json();
 }
 
@@ -62,16 +84,16 @@ export async function placeBid(
   token: string
 ) {
   const res = await fetch(`${API_URL}/bids`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(bid),
   });
   if (!res.ok) {
     const error = await res.text();
-    throw new Error(error || 'Failed to place bid');
+    throw new Error(error || "Failed to place bid");
   }
   return res.json();
 }
@@ -79,9 +101,9 @@ export async function placeBid(
 export async function getAuctionById(id: string, token: string) {
   const res = await fetch(`${API_URL}/auctions/${id}`, {
     headers: {
-      'Authorization': `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
     },
   });
-  if (!res.ok) throw new Error('Failed to fetch auction');
+  if (!res.ok) throw new Error("Failed to fetch auction");
   return res.json();
 }
