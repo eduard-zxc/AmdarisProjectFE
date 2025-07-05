@@ -72,13 +72,6 @@ const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
               >
                 LOGIN/ REGISTER
               </Button>
-              {/* <Button
-                color="inherit"
-                onClick={() => loginWithRedirect({ screen_hint: "signup" })}
-                sx={{ textTransform: "none" }}
-              >
-                REGISTER
-              </Button> */}
             </>
           ) : (
             <Button
