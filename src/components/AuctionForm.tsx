@@ -105,6 +105,7 @@ const AuctionForm = ({ onCreated }: AuctionFormProps) => {
         return;
       }
       // Create auction first
+
       const created = await createAuction(
         {
           title,
@@ -118,12 +119,14 @@ const AuctionForm = ({ onCreated }: AuctionFormProps) => {
         },
         token
       );
+      console.log("Auction created:", created, "Image file:", imageFile);
 
-      // Upload image if selected
-      if (imageFile && created?.id) {
+      // created is the auction ID (string)
+      const auctionId = typeof created === "string" ? created : created?.id;
+      if (imageFile && auctionId) {
         setImageUploading(true);
         try {
-          await uploadAuctionImage(created.id, imageFile, token);
+          await uploadAuctionImage(auctionId, imageFile, token);
         } catch (err) {
           notify("Auction created, but image upload failed", "error");
         } finally {
@@ -154,7 +157,12 @@ const AuctionForm = ({ onCreated }: AuctionFormProps) => {
         component="form"
         onSubmit={handleSubmit}
         mb={4}
-        sx={{ maxWidth: 400 }}
+        sx={{
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
       >
         <Typography variant="h6" mb={2}>
           Create Auction
@@ -245,7 +253,7 @@ const AuctionForm = ({ onCreated }: AuctionFormProps) => {
             </MenuItem>
           ))}
         </TextField>
-        <Box mt={2}>
+        <Box mt={2} width="100%">
           <Button
             variant="outlined"
             component="label"

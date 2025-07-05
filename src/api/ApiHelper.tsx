@@ -1,25 +1,27 @@
+import type { Auction } from "../types/Auction";
+
+const API_URL = "http://localhost:5188/api";
+
 // Upload an image for an auction
 export async function uploadAuctionImage(
   auctionId: string,
   file: File,
   token: string
 ) {
+  console.log("Uploading image for auction:", auctionId, "File:", file);
   const formData = new FormData();
   formData.append("file", file);
   const res = await fetch(`${API_URL}/images/${auctionId}`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
-      // Do not set Content-Type, browser will set it for multipart/form-data
     },
     body: formData,
   });
   if (!res.ok) throw new Error("Failed to upload image");
+  console.log("Image uploaded successfully:", res);
   return res.json();
 }
-import type { Auction } from "../types/Auction";
-
-const API_URL = "http://localhost:5188/api";
 
 export async function createAuction(
   auction: Omit<Auction, "id">,

@@ -36,7 +36,6 @@ function Countdown({
   const start = new Date(startTime).getTime();
   const end = new Date(endTime).getTime();
   if (now < start) {
-    // Auction not started
     const left = getTimeLeft(start, now);
     return <span>Starts in {formatTime(left)}</span>;
   }
@@ -44,7 +43,7 @@ function Countdown({
     return <span>Ended</span>;
   }
   const left = getTimeLeft(end, now);
-  return <span>{formatTime(left)}</span>;
+  return <span>Ends in {formatTime(left)}</span>;
 }
 
 function getTimeLeft(end: number, now: number) {
@@ -149,7 +148,6 @@ export default function AuctionList() {
           const isEnded = now >= end;
           const isStartingSoon = now < start;
 
-          // Card always clickable to details
           return (
             <Grid key={a.id}>
               <Box
