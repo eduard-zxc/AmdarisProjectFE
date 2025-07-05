@@ -84,13 +84,21 @@ export default function AuctionList() {
 
           let image = noImage;
           if (a.images && a.images.length > 0 && a.images[0].url) {
-            image = a.images[0].url; // Use the full SAS URL from backend
+            const imgUrl = a.images[0].url;
+            if (imgUrl.startsWith("http")) {
+              // Use full SAS URL from backend
+              image = imgUrl;
+            } else {
+              // Construct URL and append SAS token if available
+              const baseUrl = import.meta.env.VITE_BLOB_BASE_URL;
+              const container = import.meta.env.VITE_BLOB_CONTAINER_NAME;
+              const sasToken = import.meta.env.VITE_BLOB_SAS_TOKEN;
+              image = `${baseUrl}/${container}/${imgUrl}`;
+              if (sasToken) {
+                image += image.includes("?") ? `&${sasToken}` : `?${sasToken}`;
+              }
+            }
           }
-
-          // For debugging: log the image URL
-          // Remove/comment this after debugging
-          // eslint-disable-next-line no-console
-          console.log("Auction image URL:", image);
 
           return (
             <Grid key={a.id}>
@@ -112,7 +120,6 @@ export default function AuctionList() {
                   image={image}
                   alt={a.title}
                   onError={(e) => {
-                    // fallback to noImage if loading fails
                     if (e.currentTarget.src !== noImage) {
                       e.currentTarget.src = noImage;
                     }
