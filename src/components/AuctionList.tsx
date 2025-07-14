@@ -163,7 +163,7 @@ export default function AuctionList() {
                     display: "flex",
                     flexDirection: "column",
                     minWidth: 280,
-                    maxWidth: 340,
+                    maxWidth: 280,
                     width: "100%",
                     cursor: "pointer",
                   }}
@@ -196,11 +196,7 @@ export default function AuctionList() {
                     >
                       <Chip
                         label={
-                          isEnded
-                            ? "Ended"
-                            : isStartingSoon
-                            ? "Starting Soon"
-                            : "Live"
+                          isEnded ? "Ended" : isStartingSoon ? "Soon" : "Live"
                         }
                         size="small"
                         color={
@@ -241,7 +237,7 @@ export default function AuctionList() {
                       alignItems="center"
                       spacing={1}
                       sx={{
-                        bgcolor: "#e8f5e9",
+                        bgcolor: isEnded ? "#ffebee" : "#e8f5e9",
                         borderRadius: 2,
                         p: 1,
                         mt: 2,
@@ -249,17 +245,20 @@ export default function AuctionList() {
                         justifyContent: "center",
                       }}
                     >
-                      <GavelIcon color="success" fontSize="small" />
+                      <GavelIcon
+                        color={isEnded ? "error" : "success"}
+                        fontSize="small"
+                      />
                       <Typography
                         variant="subtitle2"
-                        color="success.main"
+                        color={isEnded ? "error.main" : "success.main"}
                         fontWeight="bold"
                       >
-                        Current Bid:
+                        {isEnded ? "Final Bid:" : "Current Bid:"}
                       </Typography>
                       <Typography
                         variant="h6"
-                        color="success.main"
+                        color={isEnded ? "error.main" : "success.main"}
                         fontWeight="bold"
                         sx={{ ml: 1 }}
                       >

@@ -48,7 +48,6 @@ export default function AuctionDetails() {
     }
   }, [id, getAccessTokenSilently, notify]);
 
-  // Ensure id is a string for useBidHub
   const auctionId = id ?? "";
   const { placeBid: placeBidSignalR } = useBidHub(auctionId, (bid) => {
     setBids((prev) => [bid, ...prev]);
@@ -93,7 +92,7 @@ export default function AuctionDetails() {
           audience: import.meta.env.VITE_AUTH0_AUDIENCE,
         },
       });
-      // Send bid to API with correct userId (GUID)
+
       await import("../api/ApiHelper").then(({ placeBid }) =>
         placeBid({ auctionId, amount: bidAmount, userId }, token)
       );
@@ -107,10 +106,15 @@ export default function AuctionDetails() {
     }
   };
 
+  const now = Date.now();
+  const start = new Date(auction.startTime).getTime();
+  const end = new Date(auction.endTime).getTime();
+  const isEnded = now >= end;
+  const isStartingSoon = now < start;
+
   return (
     <Box sx={{ maxWidth: 700, mx: "auto", mt: 6 }}>
       <Paper sx={{ p: 4, borderRadius: 3, boxShadow: 3 }}>
-        {/* Auction Image */}
         {auction.images && auction.images.length > 0 && (
           <Box sx={{ mb: 3 }}>
             <img
@@ -125,29 +129,26 @@ export default function AuctionDetails() {
             />
           </Box>
         )}
-
         {/* Title and Status */}
         <Typography variant="h4" fontWeight="bold" gutterBottom>
           {auction.title}
         </Typography>
         <Stack direction="row" spacing={1} alignItems="center" mb={2}>
           <Chip
-            label="Live"
-            color="success"
+            label={isEnded ? "Ended" : isStartingSoon ? "Soon" : "Live"}
+            color={isEnded ? "error" : isStartingSoon ? "warning" : "success"}
             size="small"
             icon={<FiberManualRecordIcon sx={{ fontSize: 12 }} />}
           />
         </Stack>
-
         {/* Description */}
         <Typography variant="body1" color="text.secondary" mb={2}>
           {auction.description}
         </Typography>
-
-        {/* Current Bid */}
+        {/* Current/Final Bid */}
         <Box
           sx={{
-            bgcolor: "#e8f5e9",
+            bgcolor: isEnded ? "#ffebee" : "#e8f5e9",
             borderRadius: 2,
             p: 2,
             mb: 2,
@@ -157,19 +158,22 @@ export default function AuctionDetails() {
             gap: 2,
           }}
         >
-          <GavelIcon color="success" fontSize="medium" />
+          <GavelIcon color={isEnded ? "error" : "success"} fontSize="medium" />
           <Typography
             variant="subtitle1"
-            color="success.main"
+            color={isEnded ? "error.main" : "success.main"}
             fontWeight="bold"
           >
-            Current Bid:
+            {isEnded ? "Final Bid:" : "Current Bid:"}
           </Typography>
-          <Typography variant="h5" color="success.main" fontWeight="bold">
+          <Typography
+            variant="h5"
+            color={isEnded ? "error.main" : "success.main"}
+            fontWeight="bold"
+          >
             ${currentPrice.toLocaleString()}
           </Typography>
         </Box>
-
         {/* Auction Info */}
         <Stack direction="row" spacing={4} mb={2} justifyContent="center">
           <Typography variant="body2">
@@ -180,30 +184,39 @@ export default function AuctionDetails() {
             <strong>End:</strong> {new Date(auction.endTime).toLocaleString()}
           </Typography>
         </Stack>
-
         <Divider sx={{ my: 2 }} />
-
         {/* Real-time Place Bid */}
-        <Box
-          component="form"
-          onSubmit={handleBid}
-          sx={{ display: "flex", gap: 2, alignItems: "center", mb: 2 }}
-        >
-          <TextField
-            label="Your Bid"
-            type="number"
-            value={bidAmount ?? ""}
-            onChange={(e) => setBidAmount(Number(e.target.value))}
-            inputProps={{ min: currentPrice + 1, step: 1 }}
-            required
-            size="small"
-            disabled={bidLoading}
-          />
-          <Button type="submit" variant="contained" disabled={bidLoading}>
-            {bidLoading ? "Placing..." : "Place Bid"}
-          </Button>
-        </Box>
-
+        {!isEnded && !isStartingSoon ? (
+          <Box
+            component="form"
+            onSubmit={handleBid}
+            sx={{ display: "flex", gap: 2, alignItems: "center", mb: 2 }}
+          >
+            <TextField
+              label="Your Bid"
+              type="number"
+              value={bidAmount ?? ""}
+              onChange={(e) => setBidAmount(Number(e.target.value))}
+              inputProps={{ min: currentPrice + 1, step: 1 }}
+              required
+              size="small"
+              disabled={bidLoading}
+            />
+            <Button type="submit" variant="contained" disabled={bidLoading}>
+              {bidLoading ? "Placing..." : "Place Bid"}
+            </Button>
+          </Box>
+        ) : (
+          <Typography
+            color={isEnded ? "error" : "warning"}
+            fontWeight="bold"
+            sx={{ mb: 2 }}
+          >
+            {isEnded
+              ? "Bidding is closed. Auction has ended."
+              : "Bidding is not available. Auction has not started yet."}
+          </Typography>
+        )}
         {/* Bid History */}
         {bids.length > 0 && (
           <>

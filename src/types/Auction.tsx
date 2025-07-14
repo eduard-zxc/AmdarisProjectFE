@@ -10,6 +10,8 @@ export interface Auction {
   categoryName?: string;
   startTime: string;
   endTime: string;
+  userId: string;
+  winnerId?: string | null;
   bids: Bid[];
   images: AuctionImage[];
 }
