@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import { useNotification } from "./components/NotificationsProvider";
 import AuctionDetails from "./pages/AuctionDetails";
+import UserProfile from "./pages/UserProfile";
 
 const theme = createTheme({
   palette: {
@@ -116,7 +117,6 @@ function App() {
                 <Route
                   path="/auctions/:id"
                   element={
-                    // This Box ensures AuctionDetails fills all available space
                     <Box
                       sx={{
                         flex: 1,
@@ -126,6 +126,14 @@ function App() {
                       }}
                     >
                       <AuctionDetails />
+                    </Box>
+                  }
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    <Box sx={{ flex: 1, p: 4 }}>
+                      <UserProfile />
                     </Box>
                   }
                 />

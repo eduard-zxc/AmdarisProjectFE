@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import AuctionForm from "./AuctionForm";
 import { useAuth } from "./Auth/AuthProvider";
+import { useNavigate } from "react-router-dom";
 
 export interface SidebarProps {
   onAuctionCreated: () => void;
@@ -37,6 +38,15 @@ const Sidebar = ({
   const handleOpenDialog = () => setOpenDialog(true);
   const handleCloseDialog = () => setOpenDialog(false);
   const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const menuItems = [
+    { text: "My Auctions" },
+    { text: "Bids" },
+    { text: "Categories" },
+    { text: "Profile", onClick: () => navigate("/profile") },
+    { text: "Settings" },
+  ];
 
   const drawerContent = (
     <Box
@@ -62,15 +72,13 @@ const Sidebar = ({
             <ListItemText primary="Create Auction" />
           </ListItemButton>
         </ListItem>
-        {["My Auctions", "Bids", "Categories", "Profile", "Settings"].map(
-          (text) => (
-            <ListItem key={text} disablePadding>
-              <ListItemButton>
-                <ListItemText primary={text} />
-              </ListItemButton>
-            </ListItem>
-          )
-        )}
+        {menuItems.map(({ text, onClick }) => (
+          <ListItem key={text} disablePadding>
+            <ListItemButton onClick={onClick}>
+              <ListItemText primary={text} />
+            </ListItemButton>
+          </ListItem>
+        ))}
       </List>
     </Box>
   );
@@ -95,9 +103,7 @@ const Sidebar = ({
           },
         }}
       >
-        <Toolbar sx={{ minHeight: `${appBarHeight}px` }} />{" "}
-        {/* Spacer for alignment */}
-        {drawerContent}
+        <Toolbar sx={{ minHeight: `${appBarHeight}px` }} /> {drawerContent}
       </Drawer>
       <Dialog
         open={openDialog}

@@ -81,6 +81,36 @@ export async function ensureUserExists(token: string) {
   return res.json();
 }
 
+export async function getMyBids(token: string) {
+  const res = await fetch(`${API_URL}/users/bids`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error("Failed to fetch bids");
+  return res.json();
+}
+
+export async function getMyWonAuctions(token: string) {
+  const res = await fetch(`${API_URL}/users/won-auctions`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error("Failed to fetch won auctions");
+  return res.json();
+}
+
+export async function getMySellingHistory(token: string) {
+  const res = await fetch(`${API_URL}/users/selling-history`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error("Failed to fetch selling history");
+  return res.json();
+}
+
 export async function placeBid(
   bid: { auctionId: string; amount: number; userId: string },
   token: string
