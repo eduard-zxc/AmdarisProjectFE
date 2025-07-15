@@ -68,7 +68,19 @@ function formatTime(left: {
     .padStart(2, "0")}:${left.seconds.toString().padStart(2, "0")}`;
 }
 
-export default function AuctionList() {
+interface AuctionListProps {
+  filters: {
+    categoryId: string;
+    minPrice: number;
+    maxPrice: number;
+    status: { active: boolean; ended: boolean };
+    sortBy: string;
+    sortOrder: string;
+    title: string;
+  };
+}
+
+export default function AuctionList({ filters }: AuctionListProps) {
   const [auctions, setAuctions] = useState<Auction[]>([]);
   const [loading, setLoading] = useState(true);
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
@@ -80,17 +92,22 @@ export default function AuctionList() {
         setLoading(false);
         return;
       }
-      const token = await getAccessTokenSilently({
-        authorizationParams: {
-          audience: import.meta.env.VITE_AUTH0_AUDIENCE,
-        },
-      });
-      const data = await getAuctions(token);
-      setAuctions(data.items || []);
+      setLoading(true);
+      try {
+        const token = await getAccessTokenSilently({
+          authorizationParams: {
+            audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+          },
+        });
+        const data = await getAuctions(token, filters);
+        setAuctions(data.items || []);
+      } catch {
+        notify("Failed to load auctions", "error");
+      }
       setLoading(false);
     };
     fetchAuctions();
-  }, [getAccessTokenSilently, isAuthenticated]);
+  }, [getAccessTokenSilently, isAuthenticated, filters, notify]);
 
   const handleDelete = async (id: string) => {
     if (!isAuthenticated) {
@@ -113,7 +130,7 @@ export default function AuctionList() {
 
   if (loading) return <CircularProgress />;
   return (
-    <Box>
+    <Box sx={{ flex: 1, p: 2 }}>
       <Toolbar sx={{ minHeight: 64, p: 0 }} />
       <Typography variant="h6" mb={2}>
         Auctions

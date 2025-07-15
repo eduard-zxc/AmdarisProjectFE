@@ -12,7 +12,13 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./Auth/AuthProvider";
 
-const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
+const Header = ({
+  onMenuClick,
+  onSearch,
+}: {
+  onMenuClick: () => void;
+  onSearch: (value: string) => void;
+}) => {
   const isDesktop = useMediaQuery((theme: Theme) => theme.breakpoints.up("md"));
   const navigate = useNavigate();
   const { isAuthenticated, logout, loginWithRedirect } = useAuth();
@@ -50,6 +56,7 @@ const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
         <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
           <InputBase
             placeholder="Search auctions..."
+            onChange={(e) => onSearch(e.target.value)}
             sx={{
               bgcolor: "rgba(255,255,255,0.15)",
               px: 2,

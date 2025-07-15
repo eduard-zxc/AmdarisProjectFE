@@ -16,6 +16,7 @@ import {
 import { useNotification } from "./components/NotificationsProvider";
 import AuctionDetails from "./pages/AuctionDetails";
 import UserProfile from "./pages/UserProfile";
+import type { Category } from "./types/Category";
 
 const theme = createTheme({
   palette: {
@@ -29,15 +30,27 @@ const theme = createTheme({
   },
 });
 
+const defaultFilters = {
+  categoryId: "",
+  minPrice: 0,
+  maxPrice: 100000,
+  status: { active: false, ended: false },
+  sortBy: "",
+  sortOrder: "asc",
+  title: "",
+};
+
 const drawerWidth = 180;
 const appBarHeight = 0;
 
 function App() {
   const [refresh, setRefresh] = useState(false);
-  const [categories, setCategories] = useState<string[]>([]);
+  const [filters, setFilters] = useState(defaultFilters);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [mobileOpen, setMobileOpen] = useState(false);
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const { isAuthenticated, getAccessTokenSilently } = useAuth();
+  const [searchTitle, setSearchTitle] = useState("");
   const notify = useNotification();
 
   useEffect(() => {
@@ -63,14 +76,24 @@ function App() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const cats = await getCategories("");
-        setCategories(cats.map((c: any) => c.name));
+        const token = await getAccessTokenSilently({
+          authorizationParams: {
+            audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+          },
+        });
+        const cats = await getCategories(token);
+        setCategories(
+          cats.map((c: any) => ({
+            id: c.id,
+            name: c.name,
+          }))
+        );
       } catch {
         setCategories([]);
       }
     };
     fetchCategories();
-  }, []);
+  }, [getAccessTokenSilently]);
 
   const handleDrawerToggle = () => setMobileOpen((open) => !open);
 
@@ -79,7 +102,7 @@ function App() {
       <CssBaseline />
       <AuthProvider>
         <Router>
-          <Header onMenuClick={handleDrawerToggle} />
+          <Header onMenuClick={handleDrawerToggle} onSearch={setSearchTitle} />
           <Box sx={{ display: "flex" }}>
             <Sidebar
               onAuctionCreated={() => setRefresh((r) => !r)}
@@ -106,10 +129,16 @@ function App() {
                   element={
                     <Box sx={{ display: "flex", gap: 4 }}>
                       <Box sx={{ minWidth: 260, maxWidth: 320 }}>
-                        <Filters categories={categories} />
+                        <Filters
+                          categories={categories}
+                          values={filters}
+                          onChange={setFilters}
+                        />
                       </Box>
                       <Box sx={{ flex: 1, mt: 4, mr: 4 }}>
-                        <AuctionList key={refresh ? 1 : 0} />
+                        <AuctionList
+                          filters={{ ...filters, title: searchTitle }}
+                        />
                       </Box>
                     </Box>
                   }

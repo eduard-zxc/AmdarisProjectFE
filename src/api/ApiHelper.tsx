@@ -49,14 +49,22 @@ export async function deleteAuction(id: string, token: string) {
   if (!res.ok) throw new Error("Failed to delete auction");
 }
 
-export async function getAuctions(token: string) {
-  const res = await fetch(`${API_URL}/auctions`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+export async function getAuctions(token: string, params: any = {}) {
+  const query = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value === undefined || value === "") return;
+    if (key === "status" && value && typeof value === "object") {
+      const statusObj = value as { active?: boolean; ended?: boolean };
+      if (statusObj.active) query.append("active", "true");
+      if (statusObj.ended) query.append("ended", "true");
+    } else {
+      query.append(key, value != null ? value.toString() : "");
+    }
   });
-  if (!res.ok) throw new Error("Failed to fetch auctions");
-  return res.json();
+  const res = await fetch(`${API_URL}/auctions?${query.toString()}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return await res.json();
 }
 
 export async function getCategories(token: string) {
