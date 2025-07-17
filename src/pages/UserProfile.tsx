@@ -12,7 +12,7 @@ import {
   Tabs,
   Tab,
 } from "@mui/material";
-import { useAuth } from "../components/Auth/AuthProvider";
+import { useAuth } from "../components/auth/AuthProvider";
 import {
   getMyBids,
   getMyWonAuctions,

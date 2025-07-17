@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "./Auth/AuthProvider";
+import { useAuth } from "./auth/AuthProvider";
 
 const Header = ({
   onMenuClick,

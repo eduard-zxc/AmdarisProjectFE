@@ -13,7 +13,7 @@ import {
   Toolbar,
 } from "@mui/material";
 import AuctionForm from "./AuctionForm";
-import { useAuth } from "./Auth/AuthProvider";
+import { useAuth } from "./auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
 
 export interface SidebarProps {
@@ -42,7 +42,7 @@ const Sidebar = ({
 
   const menuItems = [
     { text: "My Auctions" },
-    { text: "Bids" },
+    { text: "Admin Dashboard", onClick: () => navigate("/admin") },
     { text: "Categories" },
     { text: "Profile", onClick: () => navigate("/profile") },
     { text: "Settings" },

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { AuthProvider, useAuth } from "./components/Auth/AuthProvider";
+import { AuthProvider, useAuth } from "./components/auth/AuthProvider";
 import Sidebar from "./components/Sidebar";
 import Filters from "./components/Filters";
 import AuctionList from "./components/AuctionList";
@@ -17,6 +17,7 @@ import { useNotification } from "./components/NotificationsProvider";
 import AuctionDetails from "./pages/AuctionDetails";
 import UserProfile from "./pages/UserProfile";
 import type { Category } from "./types/Category";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const theme = createTheme({
   palette: {
@@ -163,6 +164,14 @@ function App() {
                   element={
                     <Box sx={{ flex: 1, p: 4 }}>
                       <UserProfile />
+                    </Box>
+                  }
+                />
+                <Route
+                  path="/admin"
+                  element={
+                    <Box sx={{ flex: 1, p: 4 }}>
+                      <AdminDashboard />
                     </Box>
                   }
                 />

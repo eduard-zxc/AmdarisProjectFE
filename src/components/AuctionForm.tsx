@@ -15,7 +15,7 @@ import {
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { useAuth } from "../components/Auth/AuthProvider";
+import { useAuth } from "./auth/AuthProvider";
 import { useNotification } from "./NotificationsProvider";
 
 type AuctionFormProps = {
