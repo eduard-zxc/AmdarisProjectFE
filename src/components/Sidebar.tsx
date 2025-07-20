@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Drawer,
   List,
@@ -15,6 +15,7 @@ import {
 import AuctionForm from "./AuctionForm";
 import { useAuth } from "./auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 export interface SidebarProps {
   onAuctionCreated: () => void;
@@ -34,19 +35,32 @@ const Sidebar = ({
   appBarHeight,
 }: SidebarProps) => {
   const [openDialog, setOpenDialog] = useState(false);
-
   const handleOpenDialog = () => setOpenDialog(true);
   const handleCloseDialog = () => setOpenDialog(false);
-  const { user } = useAuth();
+  const { user, getAccessTokenSilently } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      if (!user) return;
+      const token = await getAccessTokenSilently();
+      const decoded: any = jwtDecode(token);
+      const roles = decoded["https://online-auction-app.com/roles"];
+      setIsAdmin(roles && roles.includes("admin"));
+    };
+    checkAdmin();
+  }, [user, getAccessTokenSilently]);
 
   const menuItems = [
     { text: "My Auctions" },
-    { text: "Admin Dashboard", onClick: () => navigate("/admin") },
+    isAdmin
+      ? { text: "Admin Dashboard", onClick: () => navigate("/admin") }
+      : null,
     { text: "Categories" },
     { text: "Profile", onClick: () => navigate("/profile") },
     { text: "Settings" },
-  ];
+  ].filter(Boolean) as { text: string; onClick?: () => void }[];
 
   const drawerContent = (
     <Box

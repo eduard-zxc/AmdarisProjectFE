@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { AuthProvider, useAuth } from "./components/auth/AuthProvider";
 import Sidebar from "./components/Sidebar";
 import Filters from "./components/Filters";
-import AuctionList from "./components/AuctionList";
+import AuctionList from "./pages/AuctionList";
 import Header from "./components/Header";
 import { ensureUserExists, getCategories } from "./api/ApiHelper";
 import {
@@ -41,7 +41,7 @@ const defaultFilters = {
   title: "",
 };
 
-const drawerWidth = 180;
+const drawerWidth = 200;
 const appBarHeight = 0;
 
 function App() {
@@ -64,7 +64,7 @@ function App() {
         });
         try {
           await ensureUserExists(token);
-          notify("Welcome! Your profile is ready.", "success");
+          // notify("Welcome! Your profile is ready.", "success");
         } catch (err) {
           notify("User check/creation failed", "error");
           console.error("User check/creation failed", err);

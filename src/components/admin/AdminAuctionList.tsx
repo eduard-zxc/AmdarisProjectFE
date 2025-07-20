@@ -8,7 +8,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 
-export default function AuctionList() {
+export default function AdminAuctionList() {
   const [auctions, setAuctions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 

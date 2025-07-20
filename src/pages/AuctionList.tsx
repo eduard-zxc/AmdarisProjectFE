@@ -16,7 +16,7 @@ import { getAuctions, deleteAuction } from "../api/ApiHelper";
 import type { Auction } from "../types/Auction";
 import { useAuth0 } from "@auth0/auth0-react";
 import noImage from "../assets/react.svg";
-import { useNotification } from "./NotificationsProvider";
+import { useNotification } from "../components/NotificationsProvider";
 import { Link as RouterLink } from "react-router-dom";
 import GavelIcon from "@mui/icons-material/Gavel";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";

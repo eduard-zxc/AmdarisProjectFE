@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Box, Paper, Typography, Tabs, Tab } from "@mui/material";
 import UserList from "../components/admin/UserList";
-import AuctionList from "../components/admin/AuctionList";
 import CategoryList from "../components/admin/CategoryList";
+import AdminAuctionList from "../components/admin/AdminAuctionList";
 
 const AdminDashboard: React.FC = () => {
   const [tab, setTab] = useState(0);
@@ -19,7 +19,7 @@ const AdminDashboard: React.FC = () => {
           <Tab label="Categories" />
         </Tabs>
         {tab === 0 && <UserList />}
-        {tab === 1 && <AuctionList />}
+        {tab === 1 && <AdminAuctionList />}
         {tab === 2 && <CategoryList />}
       </Paper>
     </Box>

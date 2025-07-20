@@ -87,15 +87,6 @@ export default function AuctionDetails() {
     }
     setBidLoading(true);
     try {
-      const token = await getAccessTokenSilently({
-        authorizationParams: {
-          audience: import.meta.env.VITE_AUTH0_AUDIENCE,
-        },
-      });
-
-      await import("../api/ApiHelper").then(({ placeBid }) =>
-        placeBid({ auctionId, amount: bidAmount, userId }, token)
-      );
       placeBidSignalR(bidAmount, userId);
       setBidAmount(null);
       notify("Bid placed!", "success");
@@ -186,7 +177,7 @@ export default function AuctionDetails() {
         </Stack>
         <Divider sx={{ my: 2 }} />
         {/* Real-time Place Bid */}
-        {!isEnded && !isStartingSoon ? (
+        {!isEnded ? (
           <Box
             component="form"
             onSubmit={handleBid}
@@ -207,14 +198,8 @@ export default function AuctionDetails() {
             </Button>
           </Box>
         ) : (
-          <Typography
-            color={isEnded ? "error" : "warning"}
-            fontWeight="bold"
-            sx={{ mb: 2 }}
-          >
-            {isEnded
-              ? "Bidding is closed. Auction has ended."
-              : "Bidding is not available. Auction has not started yet."}
+          <Typography color="error" fontWeight="bold" sx={{ mb: 2 }}>
+            Bidding is closed. Auction has ended.
           </Typography>
         )}
         {/* Bid History */}
