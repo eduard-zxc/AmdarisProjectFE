@@ -3,6 +3,7 @@ import { Box, Paper, Typography, Tabs, Tab } from "@mui/material";
 import UserList from "../components/admin/UserList";
 import CategoryList from "../components/admin/CategoryList";
 import AdminAuctionList from "../components/admin/AdminAuctionList";
+import AuditLogTable from "../components/admin/AuditLogTable"; // <-- import
 
 const AdminDashboard: React.FC = () => {
   const [tab, setTab] = useState(0);
@@ -17,10 +18,12 @@ const AdminDashboard: React.FC = () => {
           <Tab label="Users" />
           <Tab label="Auctions" />
           <Tab label="Categories" />
+          <Tab label="Audit Logs" /> {/* New tab */}
         </Tabs>
         {tab === 0 && <UserList />}
         {tab === 1 && <AdminAuctionList />}
         {tab === 2 && <CategoryList />}
+        {tab === 3 && <AuditLogTable />} {/* Render here */}
       </Paper>
     </Box>
   );

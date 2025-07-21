@@ -2,7 +2,6 @@ import type { Auction } from "../types/Auction";
 
 const API_URL = "http://localhost:5188/api";
 
-// Upload an image for an auction
 export async function uploadAuctionImage(
   auctionId: string,
   file: File,
