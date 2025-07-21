@@ -16,6 +16,7 @@ import AuctionForm from "./AuctionForm";
 import { useAuth } from "./auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import { useIsAdmin } from "../hooks/useIsAdmin";
 
 export interface SidebarProps {
   onAuctionCreated: () => void;
@@ -37,20 +38,10 @@ const Sidebar = ({
   const [openDialog, setOpenDialog] = useState(false);
   const handleOpenDialog = () => setOpenDialog(true);
   const handleCloseDialog = () => setOpenDialog(false);
-  const { user, getAccessTokenSilently } = useAuth();
-  const [isAdmin, setIsAdmin] = useState(false);
+  const { user } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const checkAdmin = async () => {
-      if (!user) return;
-      const token = await getAccessTokenSilently();
-      const decoded: any = jwtDecode(token);
-      const roles = decoded["https://online-auction-app.com/roles"];
-      setIsAdmin(roles && roles.includes("admin"));
-    };
-    checkAdmin();
-  }, [user, getAccessTokenSilently]);
+  const isAdmin = useIsAdmin();
 
   const menuItems = [
     { text: "My Auctions" },

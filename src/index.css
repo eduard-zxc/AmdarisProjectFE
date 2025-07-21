@@ -1,13 +1,11 @@
-/* CSS Reset */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-/* Set a global font and background color (optional, MUI handles most of this) */
 body {
-  font-family: 'Roboto', Arial, sans-serif;
+  font-family: "Roboto", Arial, sans-serif;
   background: #f6f7fb;
   color: #222;
 }

@@ -20,6 +20,7 @@ import { useNotification } from "../components/NotificationsProvider";
 import { Link as RouterLink } from "react-router-dom";
 import GavelIcon from "@mui/icons-material/Gavel";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
+import { useIsAdmin } from "../hooks/useIsAdmin";
 
 function Countdown({
   startTime,
@@ -85,6 +86,7 @@ export default function AuctionList({ filters }: AuctionListProps) {
   const [loading, setLoading] = useState(true);
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
   const notify = useNotification();
+  const isAdmin = useIsAdmin();
 
   useEffect(() => {
     const fetchAuctions = async () => {
@@ -284,17 +286,19 @@ export default function AuctionList({ filters }: AuctionListProps) {
                     </Stack>
                   </CardContent>
                   <CardActions sx={{ justifyContent: "flex-end" }}>
-                    <IconButton
-                      edge="end"
-                      aria-label="delete"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        handleDelete(a.id);
-                      }}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
+                    {isAdmin && (
+                      <IconButton
+                        edge="end"
+                        aria-label="delete"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleDelete(a.id);
+                        }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    )}
                   </CardActions>
                 </Card>
               </Box>

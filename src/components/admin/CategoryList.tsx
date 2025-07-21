@@ -27,7 +27,6 @@ export default function CategoryList() {
       });
   }, []);
 
-  // Create category
   const handleCreate = async () => {
     if (!newCategory.trim()) return;
     const token = await getAccessTokenSilently();
@@ -46,7 +45,6 @@ export default function CategoryList() {
     }
   };
 
-  // Delete category
   const handleDelete = async (id: string) => {
     const token = await getAccessTokenSilently();
     await fetch(`${import.meta.env.VITE_API_URL}/categories/${id}`, {
