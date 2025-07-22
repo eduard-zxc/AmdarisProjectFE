@@ -90,18 +90,9 @@ export default function AuctionList({ filters }: AuctionListProps) {
 
   useEffect(() => {
     const fetchAuctions = async () => {
-      if (!isAuthenticated) {
-        setLoading(false);
-        return;
-      }
       setLoading(true);
       try {
-        const token = await getAccessTokenSilently({
-          authorizationParams: {
-            audience: import.meta.env.VITE_AUTH0_AUDIENCE,
-          },
-        });
-        const data = await getAuctions(token, filters);
+        const data = await getAuctions(filters);
         setAuctions(data.items || []);
       } catch {
         notify("Failed to load auctions", "error");
@@ -109,7 +100,7 @@ export default function AuctionList({ filters }: AuctionListProps) {
       setLoading(false);
     };
     fetchAuctions();
-  }, [getAccessTokenSilently, isAuthenticated, filters, notify]);
+  }, [filters, notify]);
 
   const handleDelete = async (id: string) => {
     if (!isAuthenticated) {

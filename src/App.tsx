@@ -77,12 +77,7 @@ function App() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const token = await getAccessTokenSilently({
-          authorizationParams: {
-            audience: import.meta.env.VITE_AUTH0_AUDIENCE,
-          },
-        });
-        const cats = await getCategories(token);
+        const cats = await getCategories();
         setCategories(
           cats.map((c: any) => ({
             id: c.id,

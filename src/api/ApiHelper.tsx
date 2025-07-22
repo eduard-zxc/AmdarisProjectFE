@@ -38,6 +38,29 @@ export async function createAuction(
   return res.json();
 }
 
+export async function updateAuction(
+  id: string,
+  auction: Partial<Auction>,
+  token: string
+) {
+  const payload = {
+    ...auction,
+    id,
+  };
+
+  const res = await fetch(`${API_URL}/auctions/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error("Failed to update auction");
+  if (res.status === 204) return;
+  return res.json();
+}
+
 export async function deleteAuction(id: string, token: string) {
   const res = await fetch(`${API_URL}/auctions/${id}`, {
     method: "DELETE",
@@ -48,7 +71,7 @@ export async function deleteAuction(id: string, token: string) {
   if (!res.ok) throw new Error("Failed to delete auction");
 }
 
-export async function getAuctions(token: string, params: any = {}) {
+export async function getAuctions(params: any = {}) {
   const query = new URLSearchParams();
   Object.entries(params).forEach(([key, value]) => {
     if (value === undefined || value === "") return;
@@ -60,18 +83,12 @@ export async function getAuctions(token: string, params: any = {}) {
       query.append(key, value != null ? value.toString() : "");
     }
   });
-  const res = await fetch(`${API_URL}/auctions?${query.toString()}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await fetch(`${API_URL}/auctions?${query.toString()}`);
   return await res.json();
 }
 
-export async function getCategories(token: string) {
-  const res = await fetch(`${API_URL}/categories`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+export async function getCategories() {
+  const res = await fetch(`${API_URL}/categories`);
   if (!res.ok) throw new Error("Failed to fetch categories");
   return res.json();
 }

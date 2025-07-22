@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Drawer,
   List,
@@ -15,7 +15,6 @@ import {
 import AuctionForm from "./AuctionForm";
 import { useAuth } from "./auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
 import { useIsAdmin } from "../hooks/useIsAdmin";
 
 export interface SidebarProps {
@@ -36,12 +35,19 @@ const Sidebar = ({
   appBarHeight,
 }: SidebarProps) => {
   const [openDialog, setOpenDialog] = useState(false);
-  const handleOpenDialog = () => setOpenDialog(true);
-  const handleCloseDialog = () => setOpenDialog(false);
-  const { user } = useAuth();
+  const { user, isAuthenticated, loginWithRedirect } = useAuth();
   const navigate = useNavigate();
-
   const isAdmin = useIsAdmin();
+
+  const handleOpenDialog = () => {
+    if (!isAuthenticated) {
+      loginWithRedirect();
+      return;
+    }
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => setOpenDialog(false);
 
   const menuItems = [
     { text: "My Auctions" },
@@ -49,7 +55,9 @@ const Sidebar = ({
       ? { text: "Admin Dashboard", onClick: () => navigate("/admin") }
       : null,
     { text: "Categories" },
-    { text: "Profile", onClick: () => navigate("/profile") },
+    isAuthenticated
+      ? { text: "My Profile", onClick: () => navigate("/profile") }
+      : null,
     { text: "Settings" },
   ].filter(Boolean) as { text: string; onClick?: () => void }[];
 
