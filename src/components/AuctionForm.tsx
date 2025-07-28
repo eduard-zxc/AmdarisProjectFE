@@ -45,12 +45,7 @@ const AuctionForm = ({ onCreated }: AuctionFormProps) => {
 
   const fetchCategories = async () => {
     try {
-      const token = await getAccessTokenSilently({
-        authorizationParams: {
-          audience: import.meta.env.VITE_AUTH0_AUDIENCE,
-        },
-      });
-      const cats = await getCategories(token);
+      const cats = await getCategories();
       setCategories(cats);
     } catch (err) {
       setCategories([]);
@@ -114,6 +109,7 @@ const AuctionForm = ({ onCreated }: AuctionFormProps) => {
           categoryId,
           startTime: startTime!.toISOString(),
           endTime: endTime!.toISOString(),
+          // userId: user.sub,
           bids: [],
           images: [],
         },

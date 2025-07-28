@@ -5,11 +5,14 @@ const API_URL = "http://localhost:5188/api";
 export async function uploadAuctionImage(
   auctionId: string,
   file: File,
-  token: string
+  token: string,
+  userId: string // Add this parameter
 ) {
   console.log("Uploading image for auction:", auctionId, "File:", file);
   const formData = new FormData();
   formData.append("file", file);
+  formData.append("userId", userId); // Add userId to form data
+
   const res = await fetch(`${API_URL}/images/${auctionId}`, {
     method: "POST",
     headers: {
@@ -26,13 +29,17 @@ export async function createAuction(
   auction: Omit<Auction, "id">,
   token: string
 ) {
+  const payload = {
+    ...auction,
+  };
+
   const res = await fetch(`${API_URL}/auctions`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(auction),
+    body: JSON.stringify(payload),
   });
   if (!res.ok) throw new Error("Failed to create auction");
   return res.json();
